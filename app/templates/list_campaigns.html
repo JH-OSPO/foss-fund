@@ -1,0 +1,28 @@
+{% extends "admin_home.html" %}
+
+
+{% block content %}
+<div class="container">
+  <table class="table">
+    <tr>
+      <th scope="col">Name</td>
+      <th scope="col">Start Date</th>
+      <th scope="col">End Date</th>
+      <th scope="col">Created On</th>
+    </tr>
+    {% for campaign in campaigns %}
+    <tr>
+      <td><a href="{{ url_for('admin_blueprint.campaign_view', campaign_id=campaign.id)}}">{{ campaign.title }}</a></td>
+      <td>{{ campaign.start_date.strftime('%Y-%m-%d') }}</td>
+      <td>{{ (campaign.start_date + campaign.length).strftime('%Y-%m-%d') }}</td>
+      <td>{{ campaign.created_on.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <div><a href="{{ url_for('admin_blueprint.create_campaign')}}">New</a></div>
+</div>
+{% endblock content %}
+
+{% block title %}
+Campaigns
+{% endblock title %}

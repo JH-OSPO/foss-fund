@@ -1,0 +1,10 @@
+<div class="form-wrapper">
+  <h2 class="title">Create a New Campaign</h2>
+  <form method="POST" action="{{ url_for('/admin/campaign/', 'add') }}">
+    {{ form.csrf_token }}
+    <fieldset class="form-field">
+      {{ form.name.label }}
+      {{ form.name(size=50) }}
+    </fieldset>
+  </form>
+</div>

@@ -1,0 +1,22 @@
+{% macro project_list(projects) -%}
+<div>Currently nominated projects:</div>
+<div id="custom-search-input">
+  <table class="table table-striped overflow-scroll vh-10 table-bordered">
+    <thead>
+      <tr>
+	<th scope="col">#</th>
+	<th scope="col">Project</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+      <tr>
+	<th scope="row">{{ loop.index }}</th>
+	<td>{{ project.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+{%- endmacro %}

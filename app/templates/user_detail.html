@@ -1,0 +1,70 @@
+{% extends 'admin_home.html' %}
+
+{% block content %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+      $('#is_admin').change(function() {
+	  var url = "{{ url_for('admin_blueprint.list_users', user_id=user.id)}}";
+	  $.ajax({
+	      type: "POST",
+	      url: url,
+	      data: $('form').serialize(),
+	      success: function(data) {
+		  console.log(data)
+	      }
+	  })
+      });
+
+      $.ajaxSetup({
+	  beforeSend: function(xhr, settings) {
+	      if(!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+		  xhr.setRequestHeader("X-CSRFToken", "{{ form.csrf_token._value() }}")
+	      }
+	  }
+      })
+  });
+</script>
+
+
+<div class="container">
+  <form method="POST" id="foo">
+    {{ form.csrf_token }}
+    <div class="table">
+      <div class="row">
+	<div class="col">Name: </div>
+	<div class="col">{{ user.givenname }} {{ user.surname }}</div>
+      </div>
+      <div class="row">
+	<div class="col">Email: </div>
+	<div class="col">{{ user.email }}</div>
+      </div>
+      <div class="row">
+	<div class="col">JHED ID: </div>
+	<div class="col">{{ user.jhed_id }}</div>
+      </div>
+      <div class="row">
+	<div class="col">Administrator</div>
+	<div class="col">{{ form.is_admin(checked=user.administrator) }}</div>
+      </div>
+    </div>
+      <div class="container-md row">
+	<div>Nominations: </div>
+	<div class="panel-body">
+	  <ul class="list-group">
+	    {% for nomination in nominations %}
+	    <li class="list-group-item">
+	      <div class="row">
+		<div class="col">{{ nomination.project.name }}</div>
+		<div class="col justify-content-end">{{ nomination.nomination_date.strftime('%Y-%m-%d') }}</div>
+	      </div>
+	    </li>
+	    {% endfor %}
+	  </ul>
+	</div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% extends 'admin_home.html' %}
+
+{% block title %}Nominations{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <table class="table">
+    {% for nomination in nominations %}
+    <tr>
+      <td>{{ nomination.project.name }}</td>
+      <td>{{ nomination.project.url }}</td>
+      <td>{{ nomination.user.jhed_id }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div><a href="{{ url_for('admin_blueprint.create_nomination') }}"/>New</a></div>
+{% endblock content %}

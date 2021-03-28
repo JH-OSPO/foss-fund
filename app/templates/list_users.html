@@ -1,0 +1,13 @@
+{% extends 'admin_home.html' %}
+
+{% block content %}
+<div class="container">
+  <table class="table">
+    {% for user in users %}
+    <tr>
+      <td><a href="{{ url_for('admin_blueprint.list_users', user_id=user.id) }}">{{ user.givenname }} {{ user.surname }}</a> {% if user.is_admin() %}(admin){% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock content %}

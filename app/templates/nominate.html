@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('button#submit').click(function() {
+
+	  var form = $('form#nomination')
+	  var url = "{{ url_for('nominate.nomination') }}"
+
+	  $.ajax({
+	      type: 'POST',
+	      url: url,
+	      data: form.serialize(),
+	      success: function(data) {
+		  window.location.replace("{{ url_for('nominate.success') }}")
+	      }
+	  });
+      })
+  })
+</script>
+
+<div class="container-lg">
+  <form method="POST" id="nomination">
+    {{ form.csrf_token }}
+    <div class="row row-cols-2 justify-content-evenly">
+      <div class="col">{{ form.name.label(class_="form-label") }} {{form.name(class_="form-control", list="id_datalist")}}
+	<datalist id="id_datalist">
+	  {% for project in projects %}
+	  <option value="{{ project.name }}" id="{{ project.id }}">
+	  {% endfor %}
+	</datalist>
+      </div>
+      <div class="col">{{ form.url.label(class_="form-label") }} {{form.url(class_="form-control")}}</div>
+    </div>
+    <div class="row justify-content-evenly rol-cols-1">
+      <div class="col align-items-middle">{{ form.reason.label(class_="form-label") }} {{ form.reason(class_="form-control") }}</div>
+    </div>
+    <div class="row rol-cols-4 mt-2">
+      <div class="col-2"><button class="form-control btn btn-primary" type="button" id="submit">Submit</button></div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+{% block title %}
+Nominate Your Open Source Project
+{% endblock %}

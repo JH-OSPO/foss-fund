@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ campaign.title }}{% endblock title %}
+
+{% block content %}
+<div class="container-md">
+  <div class="row"><h4>Thank You!</h4></div>
+  <div class="row">
+    <div class="col-12">
+      Thank you for your vote. With your help, a Free and Open Source project will benefit from this month's FOSS-Fund award. <br/><br/>
+      Do you have a FOSS project that should be considered for the JHU FOSS-Fund award? <a href="{{ url_for('nominate.nomination') }}">Nominate it!</a>
+    </div>
+  </div>
+</div>
+{% endblock content %}

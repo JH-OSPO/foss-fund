@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block local_menu %}
+	      <li>
+		<a class="nav-link" href="{{ url_for('admin_blueprint.list_campaigns') }}">
+		  <img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
+		  Campaigns Admin
+		</a>
+	      </li>
+	      <li>
+		<a class="nav-link" href="{{ url_for('admin_blueprint.list_nominations') }}">
+		  <img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
+		  Nominations Admin
+		</a>
+	      </li>
+	      <li>
+		<a class="nav-link" href="{{ url_for('admin_blueprint.list_projects') }}">
+		  <img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
+		  Projects Admin
+		</a>
+	      </li>
+	      <li>
+		<a class="nav-link" href="{{ url_for('admin_blueprint.list_users') }}">
+		  <img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
+		  Users Admin
+		</a>
+	      </li>
+{% endblock local_menu %}
+
