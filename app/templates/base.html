@@ -5,62 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
   {% import "bootstrap/utils.html" as utils %}
+  <link rel="stylesheet" integrity href="{{ url_for('static', filename='slum.css') }}">
   <title>Johns Hopkins OSPO FOSS Fund</title>
 </head>
 <body>
   <div class="container-fluid">
-     <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-          <div class="sidebar-sticky mt-3">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link active" href="/"> 
-		  <img src="{{url_for('static', filename='home-24px.svg')}}" height=24 width=24 />
-                  Home
-                </a>
-              </li>
-	      <li>
-		<a class="nav-link" href="/vote">
-		  <img src="{{ url_for('static', filename='how_to_vote-24px.svg')}}" height=24 width=24 />
-		  Vote for a Project
-		</a>
-	      </li>	   
-	      <li>
-		<a class="nav-link" href="/nominate">
-		  <img src="{{url_for('static', filename='how_to_vote-24px.svg')}}" height=24 width=24 />
-		  Nominate a Project
-		</a>
-	      </li>
-	      <li>
-		<a class="nav-link" href="/admin">
-		  <img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
-		  Admin
-		</a>
-	      </li>
-	      {% block local_menu %}
-	      {% endblock local_menu %}
-	    </ul>
-          </div>
-	</nav>
-	<div class="col-md-6">
-	  {%- with messages = get_flashed_messages(with_categories=True) %}
-	  {%- if messages %}
-	  <div class="row">
-	    <div class="col-md-12">
-	      {{ utils.flashed_messages(messages)}}
-	    </div>
+    <div class="row" id="gcme-header">
+
+      <nav class="navbar navbar-expand-lg navbar-light">
+	<a href="https://drcc.library.jhu.edu/open-source-programs-office">
+	<img src="{{ url_for('static', filename='sheridan-libraries.logo.png') }}"></a>
+	<a href="https://drcc.library.jhu.edu/open-source-programs-office" class="navbar-brand ember-view">Open Source Programs Office<br>
+	  <small>Free and Open Source Software Fund</small></a>
+      </nav>
+    </div>
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky mt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href="/"> 
+		<img src="{{url_for('static', filename='home-24px.svg')}}" height=24 width=24 />
+                Home
+              </a>
+            </li>
+	    <li>
+	      <a class="nav-link" href="/vote">
+		<img src="{{ url_for('static', filename='how_to_vote-24px.svg')}}" height=24 width=24 />
+		Vote for a Project
+	      </a>
+	    </li>	   
+	    <li>
+	      <a class="nav-link" href="/nominate">
+		<img src="{{url_for('static', filename='how_to_vote-24px.svg')}}" height=24 width=24 />
+		Nominate a Project
+	      </a>
+	    </li>
+	    <li>
+	      <a class="nav-link" href="/admin">
+		<img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
+		Admin
+	      </a>
+	    </li>
+	    {% block local_menu %}
+	    {% endblock local_menu %}
+	  </ul>
+        </div>
+      </nav>
+      <div class="col-md-6">
+	{%- with messages = get_flashed_messages(with_categories=True) %}
+	{%- if messages %}
+	<div class="row">
+	  <div class="col-md-12">
+	    {{ utils.flashed_messages(messages)}}
 	  </div>
-	  {% endif %}
-	  {% endwith %}
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">{% block title %}{% endblock %}</h1>
-          </div>
-	  <div class="d-flex">
-	    {% block content %}
-	    {% endblock %}
-	  </div>
+	</div>
+	{% endif %}
+	{% endwith %}
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">{% block title %}{% endblock %}</h1>
+        </div>
+	<div class="d-flex">
+	  {% block content %}
+	  {% endblock %}
 	</div>
       </div>
     </div>
+  </div>
 </body>
 </html>
