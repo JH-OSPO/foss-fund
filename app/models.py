@@ -3,7 +3,10 @@ from datetime import datetime,timedelta
 
 from flask import render_template
 
+from dataclasses import dataclass
+
 from app import db
+import json
 
 class User(db.Model):
     __tablename__ = "users"
@@ -110,6 +113,7 @@ class CampaignCandidate(db.Model):
     def __repr__(self):
         return f'<Object CampaignCandidtate id: {self.id}> Project Name: {self.project.name}, Campaign Name: {self.campaign.name}'
 
+@dataclass
 class Vote(db.Model):
     __tablename__ = "votes"
 
@@ -119,8 +123,8 @@ class Vote(db.Model):
     user_id = db.Column(db.String(40), db.ForeignKey('users.id'))
     user = db.relationship('User')
     votes = db.Column(db.JSON)
+    date = db.Column(db.DateTime, default=datetime.now())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-       
+        #dict.__init__(self, id=id, campaign_id=campaign_id, user_id=user_id, votes=votes, date=date)

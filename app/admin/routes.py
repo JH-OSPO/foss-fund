@@ -14,7 +14,9 @@ def permission_check():
     else:
         u = User.query.filter(User.jhed_id == request.headers.get('USERPRINCIPALNAME')).first()
 
+    print(u.jhed_id)
     if not u.administrator:
+            print(u.administrator)
             abort(403)
             return False
     return

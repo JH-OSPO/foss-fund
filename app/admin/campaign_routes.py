@@ -1,11 +1,12 @@
 from flask import Blueprint, request, render_template, redirect, url_for, current_app, session, jsonify, flash, abort
-from app.models import User, Campaign, Nomination, CampaignCandidate, Project, CampaignStatus
+from app.models import User, Campaign, Nomination, CampaignCandidate, Project, CampaignStatus, Vote
 from sqlalchemy import func, desc
 from . import admin_blueprint
 from .campaign import CreateCampaignForm
 
 import datetime
 import jsonpickle
+import json
 
 from app import db, generate_uuid, is_development
 import datetime
@@ -133,3 +134,30 @@ def remove_campaign_candidate(campaign_id):
             db.session.commit()
 
         return {'project_id': candidate.project_id}
+
+@admin_blueprint.route('/admin/campaign/<campaign_id>/results', methods=['GET'])
+def campaign_results(campaign_id):
+    if campaign_id is None:
+        return abort(500)
+    
+    votes = []
+    v = Vote.query.filter(Vote.campaign_id == campaign_id)
+
+    for voteobj in v:
+        vote ={}
+        vote['id'] = voteobj.id
+        vote['user_jhed_id'] = voteobj.user.jhed_id
+        vote['votes'] = []
+        for candidate_id in json.loads(voteobj.votes)['votes']:
+            candidate = CampaignCandidate.query.filter(CampaignCandidate.id == candidate_id).first()
+            vote['votes'].append({
+                'project': {
+                    'id': candidate.project.id,
+                    'name': candidate.project.name,
+                    'url': candidate.project.url
+                }
+            })
+        
+        votes.append(vote)
+    
+    return jsonify(votes)

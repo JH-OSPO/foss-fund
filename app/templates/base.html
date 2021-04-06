@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
   {% import "bootstrap/utils.html" as utils %}
   <link rel="stylesheet" integrity href="{{ url_for('static', filename='slum.css') }}">
-  <title>Johns Hopkins OSPO FOSS Fund</title>
+  <title>Johns Hopkins OSPO FOSS Contributor Fund</title>
 </head>
 <body>
   <div class="container-fluid">
@@ -16,7 +17,7 @@
 	<a href="https://drcc.library.jhu.edu/open-source-programs-office">
 	<img src="{{ url_for('static', filename='sheridan-libraries.logo.png') }}"></a>
 	<a href="https://drcc.library.jhu.edu/open-source-programs-office" class="navbar-brand ember-view">Open Source Programs Office<br>
-	  <small>Free and Open Source Software Fund</small></a>
+	  <small>Free and Open Source Software Contributor Fund</small></a>
       </nav>
     </div>
     <div class="row">
@@ -42,9 +43,9 @@
 	      </a>
 	    </li>
 	    <li>
-	      <a class="nav-link" href="/admin">
-		<img src="{{ url_for('static', filename='admin_panel_settings-black-18dp.svg')}}" height=24 width=24 />
-		Admin
+	      <a class="nav-link" href="mailto:ospo@jhu.edu">
+		<img src="{{ url_for('static', filename='alternate_email-24px.svg')}}" height=24 width=24 />
+		Contact Us
 	      </a>
 	    </li>
 	    {% block local_menu %}

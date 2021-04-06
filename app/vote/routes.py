@@ -4,6 +4,7 @@ from app import is_development, generate_uuid
 from .vote import VoteForm
 import json
 from sqlalchemy import desc
+import datetime
 
 
 from enum import IntFlag, auto
@@ -60,6 +61,7 @@ def vote(campaign_id = None):
         vote.campaign_id = campaign_id
         vote.user_id = user.id
         vote.votes = json.dumps(data['votes'])
+        vote.date = datetime.now()
         db.session.add(vote)
         db.session.commit()
 
