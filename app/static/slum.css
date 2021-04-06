@@ -39,3 +39,28 @@
 body {
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
+
+div.container#results {
+    margin-top: 10px;
+} 
+
+div.container#results h5 {
+    text-align: center;
+}
+
+table#results thead tr td{
+    text-align: center;
+}
+
+table#results thead{
+    background-color: #7acaff;
+}
+
+table#results td {
+    border: 1px solid #dee2e6;
+}
+
+table#results {
+    border: 1px solid #dee2e6;
+    width: 100%;
+}

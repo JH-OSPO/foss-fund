@@ -146,18 +146,24 @@ def campaign_results(campaign_id):
     for voteobj in v:
         vote ={}
         vote['id'] = voteobj.id
-        vote['user_jhed_id'] = voteobj.user.jhed_id
+        vote['user'] = json.loads(voteobj.user.toJson())
         vote['votes'] = []
         for candidate_id in json.loads(voteobj.votes)['votes']:
-            candidate = CampaignCandidate.query.filter(CampaignCandidate.id == candidate_id).first()
-            vote['votes'].append({
-                'project': {
-                    'id': candidate.project.id,
-                    'name': candidate.project.name,
-                    'url': candidate.project.url
-                }
-            })
+           candidate = CampaignCandidate.query.filter(CampaignCandidate.id == candidate_id).first()
+           vote['votes'].append(json.loads(candidate.toJson()))
         
         votes.append(vote)
     
     return jsonify(votes)
+
+@admin_blueprint.route('/admin/campaign/<campaign_id>/candidates', methods = ['GET'])
+def campaign_candidates(campaign_id):
+    if campaign_id is None:
+        return abort(500)
+    
+    campaign = Campaign.query.filter(Campaign.id == campaign_id).first()
+    candidates = []
+    for candidate in campaign.candidates:
+        candidates.append(json.loads(candidate.toJson()))
+
+    return jsonify(candidates)

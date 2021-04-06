@@ -61,7 +61,7 @@ def vote(campaign_id = None):
         vote.campaign_id = campaign_id
         vote.user_id = user.id
         vote.votes = json.dumps(data['votes'])
-        vote.date = datetime.now()
+        vote.date = datetime.datetime.now()
         db.session.add(vote)
         db.session.commit()
 

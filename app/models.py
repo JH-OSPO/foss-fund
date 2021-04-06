@@ -27,8 +27,18 @@ class User(db.Model):
     def is_admin(self):
         print(self.administrator)
         return self.administrator
-    # def is_permitted(self, item):
-    #     return (self.permissions & Permission(item.upper()) == Permission(item.upper()))
+    
+    def toJson(self):
+        user_json = {}
+        user_json['id'] = self.id
+        user_json['givenname'] = self.givenname
+        user_json['surname'] = self.surname
+        user_json['jhed_id'] = self.jhed_id
+        user_json['email'] = self.email
+        user_json['created'] = self.created
+
+        return(json.dumps(user_json, default=str))
+    
 
 class Nomination(db.Model):
     __tablename__= "nominations"
@@ -68,6 +78,15 @@ class Project(db.Model):
 
         return True
 
+    def toJson(self):
+        return json.dumps({
+            'id': self.id,
+            'name': self.name,
+            'url': self.url,
+            'description': self.description,
+            'added': self.added_on
+        }, default=str)
+
 class CampaignStatus(IntEnum):
     New = auto()
     Active = auto()
@@ -94,6 +113,15 @@ class Campaign(db.Model):
     # def __repr__(self):
     #     return f'<Object Campaign id: {self.id}> {self.start_date}-{self.start_date + self.length} created on {self.created_on}'
 
+    def toJson(self):
+        return(json.dumps({
+            'id': self.id,
+            'title': self.title,
+            'start_date': self.start_date,
+            'length': self.length,
+            'created': self.created_on,
+            'creator': json.loads(self.creator.toJson())
+        }, default=str))
     @property
     def status(self):
         pass
@@ -113,6 +141,13 @@ class CampaignCandidate(db.Model):
     def __repr__(self):
         return f'<Object CampaignCandidtate id: {self.id}> Project Name: {self.project.name}, Campaign Name: {self.campaign.name}'
 
+    def toJson(self):
+        return json.dumps({
+            'id': self.id,
+            'campaign': json.loads(self.campaign.toJson()),
+            'project': json.loads(self.project.toJson())
+        }, default=str)
+
 @dataclass
 class Vote(db.Model):
     __tablename__ = "votes"
@@ -128,3 +163,12 @@ class Vote(db.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #dict.__init__(self, id=id, campaign_id=campaign_id, user_id=user_id, votes=votes, date=date)
+
+    def toJson(self):
+        return(json.dumps({
+            'id': self.id,
+            'campaign': json.loads(self.campaign.toJson()),
+            'user': json.loads(self.user.toJson()),
+            'votes': json.loads(self.votes),
+            'date': self.date
+        }, default=str))
