@@ -148,6 +148,7 @@ def campaign_results(campaign_id):
         vote['id'] = voteobj.id
         vote['user'] = json.loads(voteobj.user.toJson())
         vote['votes'] = []
+        print(f" Test: {json.loads(voteobj.votes)}")
         for candidate_id in json.loads(voteobj.votes)['votes']:
            candidate = CampaignCandidate.query.filter(CampaignCandidate.id == candidate_id).first()
            vote['votes'].append(json.loads(candidate.toJson()))

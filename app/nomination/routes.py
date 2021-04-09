@@ -42,6 +42,9 @@ def nomination():
             nomination.user_id = user.id
             nomination.project_id = project.id
 
+            db.session.add(nomination)
+            db.session.commit()
+
             return redirect(url_for('nominate.success'))
             
 

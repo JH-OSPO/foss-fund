@@ -4,7 +4,7 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-  $(document).ready(function(){
+/*   $(document).ready(function(){
       $('button#submit').click(function() {
 
 	  var form = $('form#nomination')
@@ -19,11 +19,11 @@
 	      }
 	  });
       })
-  })
+  }) */
 </script>
 
 <div class="container-lg">
-  <form method="POST" id="nomination">
+  <form method="POST" id="nomination" action="{{ url_for('nominate.nomination') }}">
     {{ form.csrf_token }}
     <div class="row row-cols-2 justify-content-evenly">
       <div class="col">{{ form.name.label(class_="form-label") }} {{form.name(class_="form-control", list="id_datalist")}}
@@ -39,7 +39,7 @@
       <div class="col align-items-middle">{{ form.reason.label(class_="form-label") }} {{ form.reason(class_="form-control") }}</div>
     </div>
     <div class="row rol-cols-4 mt-2">
-      <div class="col-2"><button class="form-control btn btn-primary" type="button" id="submit">Submit</button></div>
+      <div class="col-2"><button class="form-control btn btn-primary" type="submit" id="submit">Submit</button></div>
     </div>
   </form>
 </div>
