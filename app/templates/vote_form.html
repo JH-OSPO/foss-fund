@@ -9,15 +9,16 @@
 <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+	  updateVoteOrder();
       $(function() {
-	  $("ul.sortable#candidates").sortable({
-	      update: function(event, ui) {
-		  updateVoteOrder();
-	      }
-	  });
+		$("ul.sortable#candidates").sortable({
+			update: function(event, ui) {
+				updateVoteOrder();
+			}
+		});
       });
 
-      $('form#vote button#submit').click(function(e) {
+/*       $('form#vote button#submit').click(function(e) {
 	  var campaign_id = "{{ campaign.id }}"
 	  var item_order = new Array()
 	  $('ul.sortable div').each(function() {
@@ -30,7 +31,7 @@
 	  console.log(data)
 	  console.log(url)
 	  
-	  $.ajax({
+/	  $.ajax({
 	      type: 'POST',
 	      url: url,
 	      contentType: "application/json",
@@ -42,7 +43,7 @@
 	  });
 
 	  e.preventDefault();
-      });
+      }); */
 
       $.ajaxSetup({
 	  beforeSend: function(xhr, settings) {
@@ -51,7 +52,6 @@
 	      }
 	  }
       })
-
 
   });
 
@@ -62,6 +62,8 @@
           item_order.push($(this).attr("id"));
       });
 
+
+	  $('input#order').val(JSON.stringify({ "votes": item_order}))
       console.log(item_order)
   }
 </script>
@@ -81,21 +83,24 @@
       {% endfor %}
     </div>
     <div class="col-4">
-      <form method="POST" id="vote" class="form-control">
-	{{ form.csrf_token }}
-	<div class="row">
-	  <div id="message">Order by preference</div>
-	</div>
-	<ul class="sortable list-group mb-2" id="candidates">
-	  {% for candidate in candidates %}
-	  <div class="list-group-item border sortable content ml=2" id="{{ candidate.id }}">{{ candidate.project.name }}</div>
-	  {% endfor %}
-	</ul>
-	<div class="row flex-row-reverse">
-	  <div class="col-md-6 content justify-content-end">
-	    <button type="button" class="btn btn-primary form-control" id="submit">Submit</button>
-	  </div>
-	</div>
+      <form method="POST" id="vote" class="form-control" action="{{ url_for('vote_blueprint.vote', campaign_id=campaign.id) }}">
+		{{ form.csrf_token }}
+		<input type="hidden" id="order" name="votes">
+		<input type="hidden" name="jhed_id" value="{{ user.jhed_id }}" />
+		<input type="hidden" name="campaign_id" value="{{ campaign.id }}" />
+		<div class="row">
+		<div id="message">Order by preference</div>
+		</div>
+		<ul class="sortable list-group mb-2" id="candidates">
+		{% for candidate in candidates %}
+		<div class="list-group-item border sortable content ml=2" id="{{ candidate.id }}">{{ candidate.project.name }}</div>
+		{% endfor %}
+		</ul>
+		<div class="row flex-row-reverse">
+		<div class="col-md-6 content justify-content-end">
+			<button type="submit" class="btn btn-primary form-control" id="submit">Submit</button>
+		</div>
+		</div>
       </form>
     </div>
   </div>

@@ -25,6 +25,7 @@ def vote(campaign_id = None):
         return "test"
 
     if is_development():
+        print("In development")
         user = User.query.filter(User.jhed_id == 'dbelros1').first()
     else:
         user = User.query.filter(User.jhed_id == request.headers['UserPrincipalName']).first()
@@ -47,8 +48,11 @@ def vote(campaign_id = None):
         else:
             print("vote does not exist")
     elif request.method == 'POST':
-        data = request.get_json()
-        user = User.query.filter(User.jhed_id == data['jhed_id']).first()
+        print(request.form)
+        data = request.form
+        print (data.get('jhed_id'))
+        user = User.query.filter(User.jhed_id == data.get('jhed_id')).first()
+        print(user)
         if user is None:
             abort(500)
             
@@ -60,12 +64,14 @@ def vote(campaign_id = None):
         vote.id = generate_uuid()
         vote.campaign_id = campaign_id
         vote.user_id = user.id
-        vote.votes = json.dumps(data['votes'])
-        vote.date = datetime.now()
+        print(data.get('votes'))
+        print(json.dumps(data.get('votes')))
+        vote.votes = data.get('votes')
+        vote.date = datetime.datetime.now()
         db.session.add(vote)
         db.session.commit()
 
-        return "Done", 200
+        return redirect(url_for('vote_blueprint.vote', campaign_id=campaign_id))
 
     
     return(render_template('vote_form.html', campaign=campaign, candidates=campaign.candidates, user=user, form=form))

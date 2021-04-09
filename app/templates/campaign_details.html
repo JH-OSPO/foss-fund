@@ -4,149 +4,206 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
-      $('#campaign_form').submit(function(e) {
-	  var url = "{{ url_for('admin_blueprint.campaign_view', campaign_id = campaign.id) }}";
-	  $.ajax({
-	      type: 'POST',
-	      url: url,
-	      data: $('form#campaign_form').serialize(),
-	      success: function(data) {
-		  console.log(data);
-		  $('div#calculated_end_date').text( data.new_end_date )
-		  $('select#status').val(data.status)
-	      }
-	  });
+	$(document).ready(function () {
+		resultObj = {}
+		resultObj.votes = {}
+		candidates = []
 
-	  e.preventDefault();
-      });
+		function fetchCandidates() {
+			console.log("fetching candidates")
+			var $header = "<tr><td></td>";
+			$.getJSON("{{ url_for('admin_blueprint.campaign_candidates', campaign_id=campaign.id)}}", function (data) {
+				var $row = 0;
+				data.forEach(candidate => {
+					$row++;
+					$header += "<td>" + $row + "</td>";
+				})
+				
+				$header += "</tr>"
+				$('table#results thead').html($header);
+			})
+		}
+		fetchCandidates()
 
-      $('button#add_candidate').click(function(e) {
-	  var project = $('ul#projects_sortable li.active')[0]
+		function fetchVotes() {
+			console.log("Fetching votes")
 
-	  $.ajax({
-	      type: 'POST',
-	      url: "{{ url_for('admin_blueprint.add_campaign_candidate', campaign_id=campaign.id) }}",
-	      contentType: "application/json",
-	      data: JSON.stringify({ "project_id": project.id }),
-	      success: function(data) {
-		  console.log(data);
-		  $('ul#candidates_sortable').append(project)
-		  $('li.active').attr('id', data);
-		  $('li.active').removeClass('active')
+			$.getJSON("{{ url_for('admin_blueprint.campaign_results', campaign_id = campaign.id)}}", function (data) {
+				row = 0
+				voteText = '';
+				console.log(data)
+				for(vote in data) {
+					console.log(data[vote].id)
+					row++
+					voteText += "<tr>";
+					voteText += "<td>" + row + "</td>";
+					for(project in data[vote].votes) {
+						console.log(data[vote].votes[project])
+						voteText += "<td>" + data[vote].votes[project].project.name + "</td>"
+					}
+					voteText += "</tr>";
 
-	      }
-	  });
-	  
-      });
+					$('table#results tbody').html(voteText);
+				}
+			})
+		}
 
-      $('button#remove_candidate').click(function(e) {
-	  var candidate = $('ul#candidates_sortable li.active')[0]
+		var refreshInterval = setInterval(fetchVotes, 30 * 1000);
+		fetchVotes();
 
-	  console.log(candidate.id);
-	  $.ajax({
-	      type: 'POST',
-	      url: "{{ url_for('admin_blueprint.remove_campaign_candidate', campaign_id=campaign.id) }}",
-	      contentType: "application/json",
-	      data: JSON.stringify({ "candidate_id": candidate.id }),
-	      success: function(data) {
-		  console.log(data),
-		  $('ul#projects_sortable').append(candidate);
-		  $('li.active').attr('id', data['project_id']);
-		  $('li.active').removeClass('active');
-	      }
-	  })
-      });
-      
-      $.ajaxSetup({
-	  beforeSend: function(xhr, settings) {
-	      if(!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-		  xhr.setRequestHeader('X-CSRFToken', "{{ form.csrf_token._value() }}")
-	      }
-	  }
-      })
+		$('#campaign_form').submit(function (e) {
+			var url = "{{ url_for('admin_blueprint.campaign_view', campaign_id = campaign.id) }}";
+			$.ajax({
+				type: 'POST',
+				url: url,
+				data: $('form#campaign_form').serialize(),
+				success: function (data) {
+					console.log(data);
+					$('div#calculated_end_date').text(data.new_end_date)
+					$('select#status').val(data.status)
+				}
+			});
 
-      $('li.selectable').click(function() {
-	  $(this).toggleClass('active').siblings().removeClass('active');
-      })
-  });
+			e.preventDefault();
+		});
 
-  $(function() {
-      $("#sortable").sortable();
-  });
+		$('button#add_candidate').click(function (e) {
+			var project = $('ul#projects_sortable li.active')[0]
+
+			$.ajax({
+				type: 'POST',
+				url: "{{ url_for('admin_blueprint.add_campaign_candidate', campaign_id=campaign.id) }}",
+				contentType: "application/json",
+				data: JSON.stringify({ "project_id": project.id }),
+				success: function (data) {
+					console.log(data);
+					$('ul#candidates_sortable').append(project)
+					$('li.active').attr('id', data);
+					$('li.active').removeClass('active')
+
+				}
+			});
+
+		});
+
+		$('button#remove_candidate').click(function (e) {
+			var candidate = $('ul#candidates_sortable li.active')[0]
+
+			console.log(candidate.id);
+			$.ajax({
+				type: 'POST',
+				url: "{{ url_for('admin_blueprint.remove_campaign_candidate', campaign_id=campaign.id) }}",
+				contentType: "application/json",
+				data: JSON.stringify({ "candidate_id": candidate.id }),
+				success: function (data) {
+					console.log(data),
+						$('ul#projects_sortable').append(candidate);
+					$('li.active').attr('id', data['project_id']);
+					$('li.active').removeClass('active');
+				}
+			})
+		});
+
+		$.ajaxSetup({
+			beforeSend: function (xhr, settings) {
+				if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+					xhr.setRequestHeader('X-CSRFToken', "{{ form.csrf_token._value() }}")
+				}
+			}
+		})
+
+		$('li.selectable').click(function () {
+			$(this).toggleClass('active').siblings().removeClass('active');
+		})
+	});
+
+	$(function () {
+		$("#sortable").sortable();
+	});
 </script>
 
 <div class="container">
-  <form method="POST" id='campaign_form'>
-    {{ form.csrf_token }}
-    <div class="row align-items-start">
-      <div class="col">
-	{{ form.name.label }}
-      </div>
-      <div class="col">
-	{{ form.name(value=campaign.title) }}
-      </div>
-    </div>
-    <div class="row align-items-start">
-      <div class="col">
-	{{ form.startDate.label }}
-      </div>
-      <div class="col">
-	{{ form.startDate(class='_datepicker', value=campaign.start_date.date()) }}
-      </div>
-    </div>
-    <div class="row align-items-start">
-      <div class="col">
-	{{ form.campaignLength.label }}
-      </div>
-      <div class="col">
-	{{ form.campaignLength(value=campaign.length.days) }}
-      </div>
-    </div>
-    <div class="row align-items-start">
-      <div class="col">{{ form.status.label }}</div>
-      <div class="col">{{ form.status }}</div>
-    </div>      
-    <div class="row align-items-start">
-      <div class="col">
-	End Date
-      </div>
-      <div class="col" id="calculated_end_date">
-	{{ (campaign.start_date + campaign.length).strftime("%B %d, %Y") }}
-      </div>
-    </div>
-    <br/>
-    <div class="container-lg border row">
-      <div class="col-5" id="projects">
-	<div>Nominations</div>
-	<div class="panel-body">
-	  <ul class="list-group" id="projects_sortable">
-	    {% for project in projects %}
-	    {% if not project.is_a_candidate(campaign.id) %}
-	    <li class="list-group-item selectable" draggable="true" data-item-sortable-id="0" id="{{ project.id }}">{{ project.name }}</li>
-	    {% endif %}
-	    {% endfor %}
-	  </ul>
+	<div class="container">
+		<form method="POST" id='campaign_form'>
+			{{ form.csrf_token }}
+			<div class="row align-items-start">
+				<div class="col">
+					{{ form.name.label }}
+				</div>
+				<div class="col">
+					{{ form.name(value=campaign.title) }}
+				</div>
+			</div>
+			<div class="row align-items-start">
+				<div class="col">
+					{{ form.startDate.label }}
+				</div>
+				<div class="col">
+					{{ form.startDate(class='_datepicker', value=campaign.start_date.date()) }}
+				</div>
+			</div>
+			<div class="row align-items-start">
+				<div class="col">
+					{{ form.campaignLength.label }}
+				</div>
+				<div class="col">
+					{{ form.campaignLength(value=campaign.length.days) }}
+				</div>
+			</div>
+			<div class="row align-items-start">
+				<div class="col">{{ form.status.label }}</div>
+				<div class="col">{{ form.status }}</div>
+			</div>
+			<div class="row align-items-start">
+				<div class="col">
+					End Date
+				</div>
+				<div class="col" id="calculated_end_date">
+					{{ (campaign.start_date + campaign.length).strftime("%B %d, %Y") }}
+				</div>
+			</div>
+			<br />
+			<div class="container-lg border row">
+				<div class="col-5" id="projects">
+					<div>Nominations</div>
+					<div class="panel-body">
+						<ul class="list-group" id="projects_sortable">
+							{% for project in projects %}
+							{% if not project.is_a_candidate(campaign.id) %}
+							<li class="list-group-item selectable" draggable="true" data-item-sortable-id="0"
+								id="{{ project.id }}">{{ project.name }}</li>
+							{% endif %}
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+				<div class="col-2 border">
+					<span class="align-middle"><button class="btn btn-sm btn-primary" type='button'
+							id="add_candidate">Add</button></span>
+					<span clas="align-middle"><button class="btn btn-sm btn-secondary" type="button"
+							id="remove_candidate">Remove</button></span>
+					</span>
+				</div>
+				<div class="col-5" id="candidates">
+					<div>Candidates</div>
+					<div class="panel-body">
+						<ul class="list-group" id="candidates_sortable">
+							{% for candidate in candidates %}
+							<li class="list-group-item selectable" draggable="true" data-item-sortable_id="0"
+								id="{{ candidate.id }}">{{ candidate.project.name }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col"><button type="submit">Submit</button></div>
+				</div>
+			</div>
+		</form>
 	</div>
-      </div>
-      <div class="col-2 border">
-	<span class="align-middle"><button class="btn btn-sm btn-primary" type='button' id="add_candidate">Add</button></span>
-	<span clas="align-middle"><button class="btn btn-sm btn-secondary" type="button" id="remove_candidate">Remove</button></span>
-	</span>
-      </div>
-      <div class="col-5" id="candidates">
-	<div>Candidates</div>
-	<div class="panel-body">
-	  <ul class="list-group" id="candidates_sortable">
-	    {% for candidate in candidates %}
-	    <li class="list-group-item selectable" draggable="true" data-item-sortable_id="0" id="{{ candidate.id }}">{{ candidate.project.name }}</li>
-	    {% endfor %}
-	  </ul>
+	<div class="container" id="results">
+		<h5>Voting Results</h5>
+		<table id="results"><thead></thead><tbody></tbody></table>
 	</div>
-      </div>
-      <div class="row">
-	<div class="col"><button type="submit">Submit</button></div>
-      </div>
-    </div>
-  </form>
+</div>
 {% endblock content %}
