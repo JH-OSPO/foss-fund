@@ -100,6 +100,7 @@ class Campaign(db.Model):
     id = db.Column(db.String(40), primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     start_date = db.Column(db.DateTime, default=datetime.now())
+    end_date = db.Column(db.DateTime, default=datetime.now())
     length = db.Column(db.Interval)
     created_on = db.Column(db.DateTime, default=datetime.now())
     creator_id = db.Column(db.String(40), db.ForeignKey('users.id'))
@@ -118,6 +119,7 @@ class Campaign(db.Model):
             'id': self.id,
             'title': self.title,
             'start_date': self.start_date,
+            'end_date': self.end_date,
             'length': self.length,
             'created': self.created_on,
             'creator': json.loads(self.creator.toJson())

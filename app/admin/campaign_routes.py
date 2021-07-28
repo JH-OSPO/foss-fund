@@ -48,6 +48,7 @@ def create_campaign():
             c.title = f.get('name')
             c.start_date = f.get('startDate')
             c.length = datetime.timedelta(days=int(f.get('campaignLength')))
+            c.end_date = c.start_date + c.length
             c.creator_id = u.id
             print(c)
             

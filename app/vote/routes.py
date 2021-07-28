@@ -1,9 +1,10 @@
 from flask import Blueprint, request, abort, render_template, jsonify, make_response, redirect, url_for
+from flask_sqlalchemy import get_debug_queries
 from app.models import *
 from app import is_development, generate_uuid
 from .vote import VoteForm
 import json
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 import datetime
 
 
@@ -14,10 +15,17 @@ vote_blueprint = Blueprint('vote_blueprint', __name__)
 @vote_blueprint.route('/vote', methods=['GET'])
 @vote_blueprint.route('/vote/latest', methods=['GET'])
 def vote_default():
-    print(CampaignStatus.Active)
-    campaign = Campaign.query.filter(Campaign.status_code == CampaignStatus.Active.value).order_by(desc('start_date')).first()
-    return(redirect(url_for('vote_blueprint.vote', campaign_id = campaign.id)))
-    
+    mydatetime = datetime.datetime.now()
+    print("%s:%s" %(mydatetime, CampaignStatus.Active.value))
+    campaign = Campaign.query.filter( and_ ( 
+               Campaign.status_code == CampaignStatus.Active.value,
+               Campaign.end_date > mydatetime,
+               Campaign.start_date < mydatetime)).order_by(desc('start_date')).first()
+    if campaign is not None:
+        print(campaign.start_date + campaign.length)
+        return(redirect(url_for('vote_blueprint.vote', campaign_id = campaign.id)))
+    else:
+        return(render_template('no-vote.html'))
 
 @vote_blueprint.route('/vote/<campaign_id>', methods=['GET', 'POST'])
 def vote(campaign_id = None):
