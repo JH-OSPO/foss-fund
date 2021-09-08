@@ -1,4 +1,5 @@
 from flask import Flask, g, request, current_app, flash
+from logging.config import dictConfig
 from flask_alembic import Alembic
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -13,6 +14,7 @@ from .extensions import db
 from .config import Config
 
 import uuid
+import logging
 import os
 from .permissions import is_allowed
 from .models import User
@@ -20,6 +22,24 @@ from .models import User
 alembic = Alembic()
 migrate = Migrate()
 csrf = CSRFProtect()
+
+dictConfig({
+        'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
+logging.getLogger('flask_cors').level = logging.DEBUG
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -84,7 +104,7 @@ def create_app(test_config=None):
     migrate.init_app(app, db, render_as_batch=True)
     csrf.init_app(app)
     Bootstrap(app)
-    CORS(app)
+    CORS(app, supports_credentials=True)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 
@@ -141,3 +161,13 @@ def is_development():
 
     return False
         
+def build_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+
+def build_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response

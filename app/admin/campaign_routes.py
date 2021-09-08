@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, redirect, url_for, current_app, session, jsonify, flash, abort
+from flask import Blueprint, request, render_template, redirect, url_for, current_app, session, jsonify, flash, abort, make_response
 from app.models import User, Campaign, Nomination, CampaignCandidate, Project, CampaignStatus, Vote
 from sqlalchemy import func, desc
 from . import admin_blueprint
@@ -8,7 +8,7 @@ import datetime
 import jsonpickle
 import json
 
-from app import db, generate_uuid, is_development
+from app import db, generate_uuid, is_development, build_preflight_response, build_actual_response
 import datetime
 
 
@@ -18,7 +18,9 @@ permission = "admin_campaigns"
 def list_campaigns():
     if request.method == 'GET':
         current_app.jinja_env.filters['timedelta'] = datetime.timedelta
-        return render_template('list_campaigns.html', campaigns=Campaign.query.all())
+        r= make_response(render_template('list_campaigns.html', campaigns=Campaign.query.all()))
+        r.headers.add("Access-Control-Allow-Origin", "*")
+        return r
     else:
         form = CreateCampaignForm()
 
@@ -58,7 +60,7 @@ def create_campaign():
         else:
             print(f)
         return redirect(url_for('admin_blueprint.list_campaigns'))
-    
+
 @admin_blueprint.route('/admin/campaign/<campaign_id>', methods=['GET', 'POST'])
 def campaign_view(campaign_id):
     form = CreateCampaignForm()
@@ -81,7 +83,9 @@ def campaign_view(campaign_id):
         form.status.choices = statuses
         form.status.process_data(c.status_code)
                 
-        return render_template('campaign_details.html', campaign=c, form=form, projects=projects, candidates=candidates, statuses=statuses)
+        r = make_response(render_template('campaign_details.html', campaign=c, form=form, projects=projects, candidates=candidates, statuses=statuses))
+        r.headers.add("Access-Control-Allow-Origin", "*")
+        return r
     elif request.method == 'POST':
         if form.validate_on_submit():
             c = Campaign.query.filter(Campaign.id == campaign_id).first()
@@ -97,7 +101,8 @@ def campaign_view(campaign_id):
                 print(c)
                 db.session.commit()
                 
-                return jsonify(title=c.title, start_date = c.start_date, length=c.length.days, new_end_date=(c.start_date + c.length).strftime('%B %d, %Y'), status=c.status_code)
+                r = make_response(jsonify(title=c.title, start_date = c.start_date, length=c.length.days, new_end_date=(c.start_date + c.length).strftime('%B %d, %Y'), status=c.status_code))
+                r.headers.add("Access-Control-Allow-Origin", "*")
 
         print(form.errors)
         return "oops", 500
@@ -136,7 +141,7 @@ def remove_campaign_candidate(campaign_id):
 
         return {'project_id': candidate.project_id}
 
-@admin_blueprint.route('/admin/campaign/<campaign_id>/results', methods=['GET'])
+@admin_blueprint.route('/admin/campaign/<campaign_id>/results', methods=['GET', 'OPTIONS'])
 def campaign_results(campaign_id):
     if campaign_id is None:
         return abort(500)
@@ -155,8 +160,9 @@ def campaign_results(campaign_id):
            vote['votes'].append(json.loads(candidate.toJson()))
         
         votes.append(vote)
-    
-    return jsonify(votes)
+    r = make_response(jsonify(votes))
+    r.headers.add("Access-Control-Allow-Origin", "*")
+    return r
 
 @admin_blueprint.route('/admin/campaign/<campaign_id>/candidates', methods = ['GET'])
 def campaign_candidates(campaign_id):

@@ -46,7 +46,7 @@ def vote(campaign_id = None):
         abort(500)
         
     form = VoteForm()
-    
+    print("vote route for %s", campaign_id)
     if request.method == 'GET':
         print(campaign_id)
         print(user.jhed_id)
