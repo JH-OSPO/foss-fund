@@ -69,7 +69,7 @@ def campaign_view(campaign_id):
         statuses = CampaignStatus
         candidates = CampaignCandidate.query.filter(CampaignCandidate.campaign_id == c.id)
         projects_list = Project.query.join(Nomination, Project.id == Nomination.project_id).add_column(func.count(Nomination.project_id).label("nomination_count")).group_by(Nomination.project_id).order_by(desc('nomination_count'))
-        print(projects_list)
+
         projects = []
         statuses = []
 
