@@ -46,8 +46,8 @@
 		    voteText = '';
 		    console.log(data)
 		    for(vote in data) {
-		 	console.log(data[vote].id)
 		 	row++
+			console.log(row)
 		 	voteText += "<tr>";
 		 	voteText += "<td>" + row + "</td>";
 		 	for(project in data[vote].votes) {
@@ -81,7 +81,7 @@
 	    };
 
 
-		var refreshInterval = setInterval(fetchVotes, 30 * 1000);
+		// var refreshInterval = setInterval(fetchVotes, 30 * 1000);
 		fetchVotes();
 
 		$('#campaign_form').submit(function (e) {
@@ -236,7 +236,11 @@
 	</div>
 	<div class="container" id="results">
 		<h5>Voting Results</h5>
-		<table id="results"><thead></thead><tbody></tbody></table>
+		<table id="results">
+		  <thead></thead>
+		  <tbody>
+		  </tbody>
+		</table>
 	</div>
 </div>
 {% endblock content %}
