@@ -35,6 +35,7 @@ jobs:
 
       - name: link github issue to jira issue
         id: link
+        if: github.event.issue.state == 'open'        
         uses: actions/github-script@v4
         with:
           script: |
@@ -47,16 +48,18 @@ jobs:
 
       - name: update original github issue to include key in title
         id: linktitle
+        if: github.event.issue.state == 'open'        
         uses: actions/github-script@v4
         env:
           ISSUE_TITLE: github.event.issue.title
         with:
           script: |
+            const { ISSUE_TITLE } = process.env
             github.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              title: "[ ${{ steps.create.outputs.issue }} ] Changed title",
+              title: "[ ${{ steps.create.outputs.issue }} ] " + ISSUE_TITLE ,
               })
             
       - name: Find Key in Title
