@@ -2,13 +2,13 @@
 name: Jira Integration
 on:
   issues:
-    types: [ opened ]
-
+    types: [ opened, closed ]
     
 jobs:
-  jira:
+  jiracreate:
     name: Create Ticket
     runs-on: ubuntu-latest
+    if: ${{ github.event.issue.state }} == "opened"
     steps:
       - name: login
         uses: atlassian/gajira-login@master
@@ -24,10 +24,32 @@ jobs:
           project: OPS
           issuetype: Task
           summary: |
-            ${{ github.event.issue.title }}
+            ${{ github.repository }} - ${{ github.event.issue.title }}
           description: |
             ${{ github.event.issue.body }}
 
       - name: Log created issue
         run: echo "Issue ${{ steps.create.outputs.issue }} was created"
+  jiraclose:
+    name: Close Ticket
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.state }} == "closed"
+    steps:
+      - name: login
+        uses: atlassian/gajira-login@master
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
+      - name: Find Key in Title
+        id: find
+        uses: atlassian/gajira-find-issue-key@master
+        with:
+          string: ${{ github.event.issue.title }}
+        
+      - name: transition to resolved
+        uses: atlassian/gajira-transition@master
+        with:
+          issue: ${{ steps.create.outputs.find }}
+          transition: "closed"
