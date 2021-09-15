@@ -55,11 +55,12 @@ jobs:
           ISSUE_TITLE: github.event.issue.title
         with:
           script: |
+            const { ISSUE_OWNER, ISSUE_REPO, ISSUE_NUMBER, ISSUE_TITLE } = process.env
             github.issues.update({
-              owner: ${ISSUE_OWNER},
-              repo: ${ISSUE_REPOSITORY},
-              issue_number: ${ISSUE_NUMBER},
-              title: [ ${{ steps.create.outputs.issue }}] ${ISSUE_TITLE}
+              owner: {ISSUE_OWNER},
+              repo: {ISSUE_REPOSITORY},
+              issue_number: {ISSUE_NUMBER},
+              title: [ ${{ steps.create.outputs.issue }}] {ISSUE_TITLE}
               })
             
       - name: Find Key in Title
