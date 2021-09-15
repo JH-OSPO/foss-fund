@@ -5,6 +5,16 @@ on:
     types: [ opened, closed ]
     
 jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+          
   jiracreate:
     name: Create Ticket
     runs-on: ubuntu-latest
