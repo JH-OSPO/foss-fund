@@ -48,18 +48,26 @@ jobs:
       - name: update original github issue to include key in title
         id: linktitle
         uses: actions/github-script@v4
+        env:
+          ISSUE_OWNER: github.event.issue.owner
+          ISSUE_REPO: github.event.issue.repository
+          ISSUE_NUMBER: github.event.issue.number
+          ISSUE_TITLE: github.event.issue.title
         with:
           script: |
             github.issues.update({
-              owner: context.issue.owner,
-              repo: context.issue.repo,
-              issue_number: context.issue.number,
-              title: 
+              owner: ${ISSUE_OWNER},
+              repo: ${ISSUE_REPOSITORY},
+              issue_number: ${ISSUE_NUMBER},
+              title: [ ${{ steps.create.outputs.issue }}] ${ISSUE_TITLE}
+              })
             
       - name: Find Key in Title
         if: github.event.issue.state != 'open'
         id: find
         uses: atlassian/gajira-find-issue-key@master
+        with:
+          string: github.event.issue.title
         
       - name: transition to resolved
         if: github.event.issue.state == 'closed'
