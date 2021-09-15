@@ -49,18 +49,14 @@ jobs:
         id: linktitle
         uses: actions/github-script@v4
         env:
-          ISSUE_OWNER: github.event.issue.owner
-          ISSUE_REPO: github.event.issue.repository
-          ISSUE_NUMBER: github.event.issue.number
           ISSUE_TITLE: github.event.issue.title
         with:
           script: |
-            const { ISSUE_OWNER, ISSUE_REPO, ISSUE_NUMBER, ISSUE_TITLE } = process.env
             github.issues.update({
-              owner: {ISSUE_OWNER},
-              repo: {ISSUE_REPOSITORY},
-              issue_number: {ISSUE_NUMBER},
-              title: [ ${{ steps.create.outputs.issue }}] {ISSUE_TITLE}
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              title: [ ${{ steps.create.outputs.issue }} ],
               })
             
       - name: Find Key in Title
