@@ -27,12 +27,22 @@ jobs:
           description: |
             ${{ github.event.issue.body }}
 
+      - name: link github issue to jira issue
+        id: link
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Linked to Jira: ${{ steps.create.outputs.issue }} '
+            })
+
       - name: Find Key in Title
         if: github.event.issue.state != 'open'
         id: find
         uses: atlassian/gajira-find-issue-key@master
-        with:
-          string: ${{ github.event.issue.number }}
         
       - name: transition to resolved
         if: github.event.issue.state == 'closed'
