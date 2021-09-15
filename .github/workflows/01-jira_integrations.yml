@@ -75,8 +75,8 @@ jobs:
           echo ${{ steps.find.outputs.issue }}
         
       - name: transition to resolved
-        if: github.event.issue.state == 'Closed (2)'
+        if: github.event.issue.state == 'closed'
         uses: atlassian/gajira-transition@master
         with:
           issue: ${{ steps.find.outputs.issue }}
-          transition: "closed"
+          transition: "Closed (2)"
