@@ -24,7 +24,7 @@ jobs:
           project: OPS
           issuetype: Task
           summary: |
-            ${{ github.repository }} - ${{ github.event.issue.title }}
+            [ ${{ github.repository }} - ${{ github.event.issue.id }} ] ${{ github.event.issue.title }}
           description: |
             ${{ github.event.issue.body }}
 
