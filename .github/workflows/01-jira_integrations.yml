@@ -11,7 +11,7 @@ jobs:
       - name: Context dump
         env:
           GITHUB_CONTEXT: toJson(github)
-        shell: |
+        run: |
           echo $GITHUB_CONTEXT
           
       - name: login
