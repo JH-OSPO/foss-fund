@@ -1,8 +1,7 @@
 ---
 name: Jira Integration
 on:
-  issues:
-    - opened
+  issues: [ opened ]
 
 jobs:
   jira:
