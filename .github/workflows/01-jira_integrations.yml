@@ -3,22 +3,9 @@ name: Jira Integration
 on:
   issues:
     types: [ opened, closed ]
-    
-jobs:
-  test:
-    name: test
+
+  jira:
     runs-on: ubuntu-latest
-    steps:
-      - name: Dump Context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_CONTEXT"
-          
-  jiracreate:
-    name: Create Ticket
-    runs-on: ubuntu-latest
-    if: ${{ github.event.issue.state == "opened" }}
     steps:
       - name: login
         uses: atlassian/gajira-login@master
@@ -30,6 +17,7 @@ jobs:
       - name: create ticket
         id: create
         uses: atlassian/gajira-create@master
+        if: github.event.issue.state == 'open'
         with:
           project: OPS
           issuetype: Task
@@ -38,28 +26,15 @@ jobs:
           description: |
             ${{ github.event.issue.body }}
 
-      - name: Log created issue
-        run: echo "Issue ${{ steps.create.outputs.issue }} was created"
-
-  jiraclose:
-    name: Close Ticket
-    runs-on: ubuntu-latest
-    if: ${{ github.event.issue.state == "closed" }}
-    steps:
-      - name: login
-        uses: atlassian/gajira-login@master
-        env:
-          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-
       - name: Find Key in Title
+        if: github.event.issue.state != 'open'
         id: find
         uses: atlassian/gajira-find-issue-key@master
         with:
           string: ${{ github.event.issue.title }}
         
       - name: transition to resolved
+        if github.event.issue.state == 'closed'
         uses: atlassian/gajira-transition@master
         with:
           issue: ${{ steps.create.outputs.find }}
