@@ -30,3 +30,4 @@ jobs:
 
       - name: Log created issue
         run: echo "Issue ${{ steps.create.outputs.issue }} was created"
+
