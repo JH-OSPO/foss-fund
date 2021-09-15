@@ -32,7 +32,7 @@ jobs:
         id: find
         uses: atlassian/gajira-find-issue-key@master
         with:
-          string: ${{ github.event.issue.title }}
+          string: ${{ github.event.issue.number }}
         
       - name: transition to resolved
         if: github.event.issue.state == 'closed'
