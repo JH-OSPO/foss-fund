@@ -8,6 +8,12 @@ jobs:
   jira:
     runs-on: ubuntu-latest
     steps:
+      - name: Context dump
+        env:
+          GITHUB_CONTEXT: toJson(github)
+        shell: |
+          echo $GITHUB_CONTEXT
+          
       - name: login
         uses: atlassian/gajira-login@master
         env:
@@ -39,6 +45,17 @@ jobs:
             body: 'Linked to Jira: ${{ steps.create.outputs.issue }} '
             })
 
+      - name: update original github issue to include key in title
+        id: linktitle
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.issues.update({
+              owner: context.issue.owner,
+              repo: context.issue.repo,
+              issue_number: context.issue.number,
+              title: 
+            
       - name: Find Key in Title
         if: github.event.issue.state != 'open'
         id: find
