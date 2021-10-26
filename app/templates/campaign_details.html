@@ -23,7 +23,6 @@
 				$('table#results thead').html($header);
 			})
 		};
-	    fetchCandidates();
 
 	    function setHeader(xhr) {
 		xhr.setRequestHeader('Access-Control-Allow-Origin', 'https://foss-fund.ospo.library.jhu.edu');
@@ -32,34 +31,47 @@
 		xhr.setRequestHeader('X-Derek-Test', 'testing');
 		console.log('Hey Hey!');
 	    }
-	    
-	    function fetchVotes() {
-		console.log("Fetching votes")
 
-		$.ajax({
-		    url: "{{ url_for('admin_blueprint.campaign_results', campaign_id = campaign.id) }}",
+	    function fetchNominations() {
+		console.log("Fetching nominations")
+
+		$ajax({
+		    url: "{{ url_for('admin_blueprint.campaign_nominations', campaign_id = campaign.id) }}",
 		    type: "GET",
 		    dataType: 'json',
 		    beforeSend: setHeader
 		}).done(function(data) {
 		    row = 0
-		    voteText = '';
-		    console.log(data)
-		    for(vote in data) {
-		 	row++
-			console.log(row)
-		 	voteText += "<tr>";
-		 	voteText += "<td>" + row + "</td>";
-		 	for(project in data[vote].votes) {
-			    
-		 	    voteText += "<td>" + data[vote].votes[project].project.name + "</td>"
-		 	}
-		 	voteText += "</tr>";
-
-	 		$('table#results tbody').html(voteText);
-		    }
+		    
 		});
+		    
+	    }
+	    // function fetchVotes() {
+	    // 	console.log("Fetching votes")
 
+	    // 	$.ajax({
+	    // 	    url: "{{ url_for('admin_blueprint.campaign_results', campaign_id = campaign.id) }}",
+	    // 	    type: "GET",
+	    // 	    dataType: 'json',
+	    // 	    beforeSend: setHeader
+	    // 	}).done(function(data) {
+	    // 	    row = 0
+	    // 	    voteText = '';
+	    // 	    console.log(data)
+	    // 	    for(vote in data) {
+	    // 	 	row++
+	    // 		console.log(row)
+	    // 	 	voteText += "<tr>";
+	    // 	 	voteText += "<td>" + row + "</td>";
+	    // 	 	for(project in data[vote].votes) {
+			    
+	    // 	 	    voteText += "<td>" + data[vote].votes[project].project.name + "</td>"
+	    // 	 	}
+	    // 	 	voteText += "</tr>";
+
+	    // 		$('table#results tbody').html(voteText);
+	    // 	    }
+	    // 	});
 
 		// $.getJSON("{{ url_for('admin_blueprint.campaign_results', campaign_id = campaign.id)}}", function (data) {
 		//     row = 0
@@ -78,11 +90,11 @@
 
 		// 	$('table#results tbody').html(voteText);
 		//     }
-	    };
+//	    };
 
 
 		// var refreshInterval = setInterval(fetchVotes, 30 * 1000);
-		fetchVotes();
+		// fetchVotes();
 
 		$('#campaign_form').submit(function (e) {
 			var url = "{{ url_for('admin_blueprint.campaign_view', campaign_id = campaign.id) }}";
@@ -103,6 +115,7 @@
 		$('button#add_candidate').click(function (e) {
 			var project = $('ul#projects_sortable li.active')[0]
 
+		    
 			$.ajax({
 				type: 'POST',
 				url: "{{ url_for('admin_blueprint.add_campaign_candidate', campaign_id=campaign.id) }}",
@@ -239,8 +252,23 @@
 		<table id="results">
 		  <thead></thead>
 		  <tbody>
+		    {% for vote in votes %}
+		    <tr>
+		      <td>{{ loop.index }}</td>
+		      {% for v in vote.votes %}		   
+		      <td> {{ v.project.name }}</td>
+		      {% endfor %}
+		    </tr>
+		    {% endfor %}
 		  </tbody>
 		</table>
+	</div>
+	<div class="container" id="nominations">
+	  <h5>Nominated Projects</h5>
+	  <table id="nominated_projects">
+	    <thead></thead>
+	    <tbody></tbody>
+	  </table>
 	</div>
 </div>
 {% endblock content %}

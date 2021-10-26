@@ -69,7 +69,21 @@ def campaign_view(campaign_id):
         statuses = CampaignStatus
         candidates = CampaignCandidate.query.filter(CampaignCandidate.campaign_id == c.id)
         projects_list = Project.query.join(Nomination, Project.id == Nomination.project_id).add_column(func.count(Nomination.project_id).label("nomination_count")).group_by(Nomination.project_id).order_by(desc('nomination_count'))
+        
+        votes = []
+        v = Vote.query.filter(Vote.campaign_id == campaign_id)
 
+        for voteobj in v:
+            vote ={}
+            vote['id'] = voteobj.id
+            vote['user'] = json.loads(voteobj.user.toJson())
+            vote['votes'] = []
+            print(f" Test: {json.loads(voteobj.votes)}")
+            for candidate_id in json.loads(voteobj.votes)['votes']:
+                candidate = CampaignCandidate.query.filter(CampaignCandidate.id == candidate_id).first()
+                vote['votes'].append(json.loads(candidate.toJson()))
+            votes.append(vote)
+            
         projects = []
         statuses = []
 
@@ -80,10 +94,11 @@ def campaign_view(campaign_id):
             projects.append(project)
             print(f"{project.name} {len(project.nominations)}")
 
+        
         form.status.choices = statuses
         form.status.process_data(c.status_code)
                 
-        r = make_response(render_template('campaign_details.html', campaign=c, form=form, projects=projects, candidates=candidates, statuses=statuses))
+        r = make_response(render_template('campaign_details.html', campaign=c, form=form, projects=projects, candidates=candidates, statuses=statuses, votes=votes))
         r.headers.add("Access-Control-Allow-Origin", "*")
         return r
     elif request.method == 'POST':
@@ -163,6 +178,11 @@ def campaign_results(campaign_id):
     r = make_response(jsonify(votes))
     r.headers.add("Access-Control-Allow-Origin", "*")
     return r
+
+@admin_blueprint.route('/admin/campaign/<campaign_id>/nominations', methods = ['GET'])
+def campaign_nominations(campaign_id):
+    pass
+
 
 @admin_blueprint.route('/admin/campaign/<campaign_id>/candidates', methods = ['GET'])
 def campaign_candidates(campaign_id):
